@@ -57,9 +57,6 @@ class BlackJack
 
 
 
-
-
-
 	public static void main(String[] args)
 	{
 		Scanner scan = new Scanner(System.in);
@@ -67,147 +64,107 @@ class BlackJack
 		Dealer dealer = new Dealer();
 		boolean outcome;
 		boolean playerTurn = true;
-		boolean dealerTurn = true;
-		
+		//boolean dealerTurn = true;		
 
 		initDeck();
-		shuffle();
 
-		for(int i = 0; i < 2; i++)	//initial 2 cards
+
+
+//Keep playing until player quits orruns out of funds
+		while(player.getMoney() > 0)
 		{
-			dealer.getCard(deal());
-			player.getCard(deal());
-		}
-		
-		dealer.showHand(false);
-		player.showHand();
+			/*
+			get the players bet
+			also ask if want to keep playing
 
+			*/
+			shuffle();
 
-		do 		//Players Turn
-		{
-			System.out.print("(H)it or (S)tay?");
-			char choice = sc.next().charAt(0);
-			choice = Character.toUpperCase(choice);
-
-			switch(choice)
+			//initial 2 cards
+			for(int i = 0; i < 2; i++)	
 			{
-				case "H":
-					player.getCard(deal());	//card added
-					player.showHand();	//show hand
-
-					if(player.tally() > 21)	//check if over
-					{
-						System.out.print("Player Busts");
-						playerTurn = false;
-					}
-					break;
-				case "S":
-					playerTurn = false;				
-					break;				
-				default:
-					System.out.print("Invalid Input!");
+				dealer.getCard(deal());
+				player.getCard(deal());
 			}
-		}
-		while(playerTurn);
-
-		dealer.showHand(true); //reveal dealers hand
-
-//to deal with
-		/*
-		deal < player
-			dealer wins
+			
+			dealer.showHand(false);
+			player.showHand();
 
 
-		deal > player
-
-			while deal < 17
-				get card
-				if bust
-					lose
-
-		deal == player
-		push
-
-		*/
-
-//Dealers turn and first check if dealer busts
-		//Does dealer turn only if player doestnt bust, 
-			//else skip dealer turn and present outcome
-		//during dealer turn, dealer must get cards until least 17
-
-
-		if(player.tally() <= 21)	//coducts the dealers turn after player is valid
-		{
-			while(dealer.tally() < 17)
+			do 		//Players Turn
 			{
-				dealer.getCard(deal());	//card add				
-				dealer.showHand(true);	//show hand
+				System.out.print("(H)it or (S)tay?");
+				char choice = sc.next().charAt(0);
+				choice = Character.toUpperCase(choice);
 
-			}
-
-			if(dealer.tally(true) > 21)	//check if busts
-			{
-				System.out.println("Dealer Busts!");
-				//dealerTurn = false;
-			}
-		}
-
-
-/*
-		do
-		{
-			//check if player already busts
-			// or dealer hyand beats player
-			if(player.tally() < dealer.tally(true))	
-			{
-				dealerTurn = false;
-				//break;
-			}
-
-			//dealer gets a card under the following
-			//dealer is less than player and less than 17
-			else if(dealer.tally() < player.tally() && dealer.tally() < 17)
-			{
-				dealer.getCard(deal());	//card add				
-				dealer.showHand(true);	//show hand
-
-				if(dealer.tally(true) > 21)	//check if busts
+				switch(choice)
 				{
-					System.out.println("Dealer Busts!");
-					dealerTurn = false;
+					case "H":
+						player.getCard(deal());	//card added
+						player.showHand();	//show hand
 
-				}	
+						if(player.tally() > 21)	//check if over
+						{
+							System.out.print("Player Busts");
+							playerTurn = false;
+						}
+						break;
+					case "S":
+						playerTurn = false;				
+						break;				
+					default:
+						System.out.print("Invalid Input!");
+				}
+			}
+			while(playerTurn);
 
+			dealer.showHand(true); //reveal dealers hand
+
+			//coducts the dealers turn after player is valid
+			if(player.tally() <= 21)	
+			{
+				while(dealer.tally() < 17)
+				{
+					dealer.getCard(deal());	//card add				
+					dealer.showHand(true);	//show hand
+
+				}
 			}
 
 
+			//Results
+
+			if(player.tally() > 21)
+			{
+				player.result(false);
+				System.out.println("Player Busts!");
+			}
+			else if(dealer.tally(true) > 21)
+			{
+				player.result(true);
+				System.out.println("Dealer Busts!");
+			}
+			else if(player.tally() < dealer.tally(true))
+			{
+				player.result(false);
+				System.out.println("You Lose!");
+			}
+			else if(player.tally() > dealer.tally(true))
+			{
+				player.result(true);
+				System.out.println("You Win!");
+			}
+			else
+			{
+				player.setBet(0);
+				player.clearHand();
+				System.out.println("Push!");
+			}
+
+
+			dealer.clearHand();
+			index = deckSize;
 		}
-		while(dealerTurn)
-*/
-
-		//check outcome
-		
-		//outcome = player.tally() > dealer.tally(true) ? true : false;
-		//player.result(outcome);
-		player.result(player.tally() > dealer.tally(true));
-		dealer.clearHand();
-		index = deckSize;
-
-
-		//get user input
-		//hit or stay
-		//if hit get card from deck
-		
-		//player.getCard(deal());
-		//player.showHand()
-		//if(player.tally() > 21)
-		//bust and how to break?
-		//
-
-
-
-
-		//outcome block
 
 		
 

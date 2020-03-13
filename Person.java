@@ -78,6 +78,11 @@ public class Player extends Person
 		return bet;
 	}
 
+	public void setBet(int bet)
+	{
+		this.bet = bet;
+	}
+
 	public void result(boolean win)
 	{
 		money = win ? money+bet : money-bet;
