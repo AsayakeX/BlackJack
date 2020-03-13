@@ -66,7 +66,8 @@ class BlackJack
 		Player player = new Player(funds);
 		Dealer dealer = new Dealer();
 		boolean outcome;
-		boolean dealerTurn = false;
+		boolean playerTurn = true;
+		boolean dealerTurn = true;
 		
 
 		initDeck();
@@ -94,22 +95,95 @@ class BlackJack
 					player.getCard(deal());	//card added
 					player.showHand();	//show hand
 
-					if(play.tally() > 21)	//check if over
+					if(player.tally() > 21)	//check if over
 					{
-						System.out.print("Bust");
-						dealerTurn = true;
+						System.out.print("Player Busts");
+						playerTurn = false;
 					}
 					break;
 				case "S":
-					dealerTurn = true;				
+					playerTurn = false;				
 					break;				
 				default:
 					System.out.print("Invalid Input!");
 			}
 		}
-		while(!dealerTurn);
+		while(playerTurn);
 
-		//Work on dealers turn
+		dealer.showHand(true); //reveal dealers hand
+
+//to deal with
+		/*
+		deal < player
+			dealer wins
+
+
+		deal > player
+
+			while deal < 17
+				get card
+				if bust
+					lose
+
+		deal == player
+		push
+
+		*/
+
+//Dealers turn and first check if dealer busts
+		//Does dealer turn only if player doestnt bust, 
+			//else skip dealer turn and present outcome
+		//during dealer turn, dealer must get cards until least 17
+
+
+		if(player.tally() <= 21)	//coducts the dealers turn after player is valid
+		{
+			while(dealer.tally() < 17)
+			{
+				dealer.getCard(deal());	//card add				
+				dealer.showHand(true);	//show hand
+
+			}
+
+			if(dealer.tally(true) > 21)	//check if busts
+			{
+				System.out.println("Dealer Busts!");
+				//dealerTurn = false;
+			}
+		}
+
+
+/*
+		do
+		{
+			//check if player already busts
+			// or dealer hyand beats player
+			if(player.tally() < dealer.tally(true))	
+			{
+				dealerTurn = false;
+				//break;
+			}
+
+			//dealer gets a card under the following
+			//dealer is less than player and less than 17
+			else if(dealer.tally() < player.tally() && dealer.tally() < 17)
+			{
+				dealer.getCard(deal());	//card add				
+				dealer.showHand(true);	//show hand
+
+				if(dealer.tally(true) > 21)	//check if busts
+				{
+					System.out.println("Dealer Busts!");
+					dealerTurn = false;
+
+				}	
+
+			}
+
+
+		}
+		while(dealerTurn)
+*/
 
 		//check outcome
 		
