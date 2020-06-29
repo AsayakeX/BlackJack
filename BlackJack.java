@@ -3,170 +3,176 @@ import java.util.Scanner;
 
 class BlackJack
 {
-	int deckSize = 52;
-	int index = 0;
-	int funds = 100;
+	//create a deck
+	int final deckSize = 52;
+	int topCard = deckSize;
 
-	Card[] reference = new Card[deckSize];
-	int[] proxy = new int[deckSize]
+	ArrayList<Integer> playerHand = new ArrayList<>();
+	int playerVal = 0;
 
-	public void initDeck()
-	{
-		for(CardSuit suit : CardSuit.values())
-		{
-			for(int rank = 1; rank <= 13; rank++)
-			{
-				reference[index] = new Card(suit, rank);
-				proxy[index] = index;
-				index++;
+	ArrayList<Integer> dealerHand = new ArrayList<>();
+	int dealerVal = 0;
+
+	ArrayList<Card> cards = new ArrayList<>(deckSize);	//Set of cards
+	int[] deck = new int[deckSize];	//Ints to represent card placement in deck
+
+	int bet = 0;
+	
+//===============================
+//	Deck Functions 
+//===============================
+	public void initCards(){	//Initializes 52 playing cards
+		for(CardSuit suit: CardSuit.values()){
+			for(CardFace face: CardFace.values()){
+				cards.add(new Card(suit, face));
 			}
 		}
 	}
-	
 
-/*
-	for(int i = 0; i < deckSize; i++)
-	{
-		proxy[i] = i;
-	}
-	*/
-
-	public void shuffle()
-	{
-		Random rng = new Random();
-		int rng1;
-		int rng2;
-
-		for(int i = 0; i < deckSize; i++)
-		{
-			rng1 = rng.nextInt(deckSize);
-			rng2 = rng.nextInt(deckSize);
-			
-			proxy[rng1]+=proxy[rng2];//7
-			proxy[rng2]=proxy[rng1]-proxy[rng2];//3
-			proxy[rng1]-=proxy[rng2];//4
+	public void initDeck(){	//Reference numbers to cards
+		for(int i = 0; i < deckSize; i++){
+			deck[i] = i;
 		}
-	} 
+	}
 
-	public Card deal()
-	{
-		Card card = reference[proxy[index]];
-		index--;
+	public void initCD(){	//Calls initCards and initDeck
+		initCards();
+		initDeck();
+	}
+
+	public void checkCards(){	//QA check cards in deck
+		for(Card card: deckBJ){
+			card.getCard();
+		}
+	}
+
+	public void checkDeck(){	//QA check reference in deck
+		for(int i: deck)
+			System.out.println(Integer.toString(i));
+	}
+
+	public void shuffle(){	//test this later
+		//int rng;
+		//int min = 0;
+
+		for(int i = 0; i < deckSize; i++){
+			//rng = (int)(Math.random()*((deckSize - min)+1))+min;
+			int rng = (int)(Math.random()*deckSize);
+			deck[i] += deck[rng];
+			deck[rng] = deck[i]-deck[rng];
+			deck[i] -= deck[rng]
+		}
+	}
+
+	public int deal(int d){	//Returns current top referrence and updates
+		int card = deck[d];
+		d--;
 		return card;
 	}
+
+//===============================
+//	Player Functions 
+//===============================
+
+	public void printHand(ArrayList<Integer> hand, int handVal){
+		for(int i: hand){
+			cards[i].getCard();
+		}
+
+		System.out.println("\nHand: " + Integer.toString(handVal));
+	}
+
+	public void calcHand(ArrayList<Interger> hand, int handVal){
+		handVal = 0;
+		for(int i: hand){
+			handVal += cards[i].getFaceVal();
+		}
+	}
+
+	public boolean checkBet(Person p, int b){
+		if(p.getFunds() >= b){
+			System.out.println("Bet placed");
+			bet = b;
+			return true;
+		}
+		else{
+			System.out.println("Not enough funds");
+			return false;
+		}
+	}
+
+//===============================
+//	Game Functions 
+//===============================
+	public void dealPhase(){
+		dealerHand.add(deal(topCard));
+		playerHand.add(deal(topCard));
+
+
+
+		dealerHand.add(deal(topCard));
+		playerHand.add(deal(topCard));
+
+
+
+	}
+
+	public void betPhase
+
+	public void playerPhase
+
+	public void revealPhase
+
+
+
+
+
+
 
 
 
 	public static void main(String[] args)
 	{
-		Scanner scan = new Scanner(System.in);
-		Player player = new Player(funds);
-		Dealer dealer = new Dealer();
-		boolean outcome;
-		boolean playerTurn = true;
-		//boolean dealerTurn = true;		
 
-		initDeck();
+		Person player = new Person();	//Player setup
+		initCD();	//Deck setup
 
+		/*game phase
 
+		shuffle
 
-//Keep playing until player quits orruns out of funds
-		while(player.getMoney() > 0)
-		{
-			/*
-			get the players bet
-			also ask if want to keep playing
+		player palces bet
 
-			*/
-			shuffle();
+		deal card dealer
+		deal card player
 
-			//initial 2 cards
-			for(int i = 0; i < 2; i++)	
-			{
-				dealer.getCard(deal());
-				player.getCard(deal());
-			}
-			
-			dealer.showHand(false);
-			player.showHand();
+		deal card dealer
+		deal card player
 
+		player hits or stays
+			if player busts auto lose
+			else continue
 
-			do 		//Players Turn
-			{
-				System.out.print("(H)it or (S)tay?");
-				char choice = sc.next().charAt(0);
-				choice = Character.toUpperCase(choice);
+		dealer reveals
 
-				switch(choice)
-				{
-					case "H":
-						player.getCard(deal());	//card added
-						player.showHand();	//show hand
+		check dealer and player
+		if player wins
+			add to player bet
+		if player lose
+			subtract from pllayter bet
+		else draw
+			do nothing
 
-						if(player.tally() > 21)	//check if over
-						{
-							System.out.print("Player Busts");
-							playerTurn = false;
-						}
-						break;
-					case "S":
-						playerTurn = false;				
-						break;				
-					default:
-						System.out.print("Invalid Input!");
-				}
-			}
-			while(playerTurn);
-
-			dealer.showHand(true); //reveal dealers hand
-
-			//coducts the dealers turn after player is valid
-			if(player.tally() <= 21)	
-			{
-				while(dealer.tally() < 17)
-				{
-					dealer.getCard(deal());	//card add				
-					dealer.showHand(true);	//show hand
-
-				}
-			}
+		reset
 
 
-			//Results
-
-			if(player.tally() > 21)
-			{
-				player.result(false);
-				System.out.println("Player Busts!");
-			}
-			else if(dealer.tally(true) > 21)
-			{
-				player.result(true);
-				System.out.println("Dealer Busts!");
-			}
-			else if(player.tally() < dealer.tally(true))
-			{
-				player.result(false);
-				System.out.println("You Lose!");
-			}
-			else if(player.tally() > dealer.tally(true))
-			{
-				player.result(true);
-				System.out.println("You Win!");
-			}
-			else
-			{
-				player.setBet(0);
-				player.clearHand();
-				System.out.println("Push!");
-			}
 
 
-			dealer.clearHand();
-			index = deckSize;
-		}
+		*/
+
+
+		//create a hand
 
 		
-
 	}
 }
