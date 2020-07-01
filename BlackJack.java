@@ -21,7 +21,7 @@ class BlackJack
 //===============================
 //	Deck Functions 
 //===============================
-	public void initCards(){	//Initializes 52 playing cards
+	public void buildCards(){	//Initializes 52 playing cards
 		for(CardSuit suit: CardSuit.values()){
 			for(CardFace face: CardFace.values()){
 				cards.add(new Card(suit, face));
@@ -29,34 +29,19 @@ class BlackJack
 		}
 	}
 
-	public void initDeck(){	//Reference numbers to cards
+	public void buildDeck(){	//Reference numbers to cards
 		for(int i = 0; i < deckSize; i++){
 			deck[i] = i;
 		}
 	}
 
-	public void initCD(){	//Calls initCards and initDeck
-		initCards();
-		initDeck();
-	}
-
-	public void checkCards(){	//QA check cards in deck
-		for(Card card: deckBJ){
-			card.getCard();
-		}
-	}
-
-	public void checkDeck(){	//QA check reference in deck
-		for(int i: deck)
-			System.out.println(Integer.toString(i));
+	public void buildCD(){	//Calls buildCards and buildDeck
+		buildCards();
+		buildDeck();
 	}
 
 	public void shuffle(){	//test this later
-		//int rng;
-		//int min = 0;
-
 		for(int i = 0; i < deckSize; i++){
-			//rng = (int)(Math.random()*((deckSize - min)+1))+min;
 			int rng = (int)(Math.random()*deckSize);
 			deck[i] += deck[rng];
 			deck[rng] = deck[i]-deck[rng];
@@ -70,9 +55,29 @@ class BlackJack
 		return card;
 	}
 
+//QA functions
+	public void checkCards(){	//QA check cards in deck
+		for(Card card: deckBJ){
+			card.getCard();
+		}
+	}
+
+	public void checkDeck(){	//QA check reference in deck
+		for(int i: deck)
+			System.out.println(Integer.toString(i));
+	}
+
+	
+
 //===============================
 //	Player Functions 
 //===============================
+	public void calcHand(ArrayList<Interger> hand, int handVal){
+		handVal = 0;
+		for(int i: hand){
+			handVal += cards[i].getFaceVal();
+		}
+	}
 
 	public void printHand(ArrayList<Integer> hand, int handVal){
 		for(int i: hand){
@@ -82,16 +87,14 @@ class BlackJack
 		System.out.println("\nHand: " + Integer.toString(handVal));
 	}
 
-	public void calcHand(ArrayList<Interger> hand, int handVal){
-		handVal = 0;
-		for(int i: hand){
-			handVal += cards[i].getFaceVal();
-		}
+	public void calcPrintHand(ArrayList<Interger> hand, int handVal){
+		calcHand(hand, handVal);
+		printHand(hand, handVal);
 	}
 
 	public boolean checkBet(Person p, int b){
 		if(p.getFunds() >= b){
-			System.out.println("Bet placed");
+			System.out.println("Bet accepted");
 			bet = b;
 			return true;
 		}
@@ -104,75 +107,127 @@ class BlackJack
 //===============================
 //	Game Functions 
 //===============================
+	//public void compareHands(Person player, int pHand, int dHand){
+	public void compareHands(Person player){
+		if(playerVal == dealerVal)
+			return;
+
+		if(playerVal > dealerVal){
+			player.addFunds(bet);
+		}
+		else{
+			player.subFunds(bet);
+		}
+	}
+
 	public void dealPhase(){
 		dealerHand.add(deal(topCard));
 		playerHand.add(deal(topCard));
 
-
-
 		dealerHand.add(deal(topCard));
 		playerHand.add(deal(topCard));
-
-
-
 	}
 
-	public void betPhase
+	//public void betPhase
 
-	public void playerPhase
+	public void hit(ArrayList<Interger> hand, int handVal, int top, boolean bust){
+		hand.add(deal(top));	//card is added
+		calcPrintHand(hand, handVal);
+
+		if(handVal > 21){
+			bust = true;
+		}
+	}
 
 	public void revealPhase
 
-
-
-
-
-
-
-
+//===============================
+//	Main
+//===============================
 
 	public static void main(String[] args)
 	{
-
+		Scanner sc = new Scanner(System.in);
 		Person player = new Person();	//Player setup
-		initCD();	//Deck setup
-
-		/*game phase
-
-		shuffle
-
-		player palces bet
-
-		deal card dealer
-		deal card player
-
-		deal card dealer
-		deal card player
-
-		player hits or stays
-			if player busts auto lose
-			else continue
-
-		dealer reveals
-
-		check dealer and player
-		if player wins
-			add to player bet
-		if player lose
-			subtract from pllayter bet
-		else draw
-			do nothing
-
-		reset
-
-
-
-
-		*/
-
-
-		//create a hand
-
 		
+		boolean game = true;
+		boolean bustDealer = false;	//check for bust
+		boolean bustPlayer = false;	//check for bust
+		boolean validBet = false;
+		boolean validInput = false;
+
+		String choice;
+
+		buildCD();	//Deck setup
+
+		do{		//Game Setup
+			do{		//Bet phase
+				System.out.println("Place bet: ");
+				bet = sc.nextInt();
+				validBet = checkBet(player, bet);
+			}
+			while(!validBet);
+
+			shuffle();
+			dealPhase(); //deal initial cards
+			calcPrintHand(playerHand, playerVal);
+			calcPrintHand(dealerHand, dealerVal);
+
+			boolean pTurn = true;
+
+			//player phase
+			do{
+				System.out.println("Hit or Stand?\n(h/s): ");
+				choice = sc.nextLine();
+
+				switch(choice){
+					case "h":
+						hit(playerHand, playerVal, topCard, bustPlayer);	//player get card
+						if(bustPlayer)	//if the player busts
+							pTurn = false;	//player phase ends
+						break;
+					case "s":
+						pTurn = false;
+						break;
+					default:
+						System.out.println("Invalid input.");
+				}
+			}
+			while(pTurn);
+
+			if(bustPlayer){//player loses so go to next game
+				player.subFunds(bet);	
+			}
+			else{	//Dealer Phase: when player did not bust
+				while(dealerVal < 17){	// this works because dealer bust when over 17 anyway
+					hit(dealerHand, dealerVal, topCard, bustDealer);	//dealer get card
+				}
+				
+				if(bustDealer){
+					player.addFunds(bet);	//player wins so go to next game
+				}
+				else{	//Reveal Phase
+					compareHands(player);	//deals with win/lose/draw
+				}				
+			}
+
+			//ask usr to play again
+			do{
+				System.out.println("Play again? \n(y/n): ");
+				choice = sc.nextLine();
+
+				switch(choice){
+					case "y":
+						break;
+					case "n":
+						game = false;
+						break;
+					default:
+						System.out.println("Invalid input.");
+				}
+			}
+			while();
+		}
+		while(game);
 	}
 }
