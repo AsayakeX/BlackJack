@@ -16,8 +16,8 @@ public enum CardSuit 	//Determins the Card suit and suit rank
 
 public enum CardFace	//Determines the cards value
 {
-	Two(2), Three(3), Four(4), Five(5), Six(6), Seven(7), Eight(8), 
-	Nine(9), Ten(10), Jack(10), Queen(10), King(10), Ace(1);
+	TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), 
+	NINE(9), TEN(10), JACK(10), QUEEN(10), KING(10), ACE(11);
 
 	private int faceVal;
 
@@ -30,28 +30,28 @@ public enum CardFace	//Determines the cards value
 	}
 }
 
-
 public class Card
 {
-	private CardSuit suit;
 	private CardFace face;
+	private CardSuit suit;
 
-	public Card(CardSuit suit, CardFace face)	//Constructor
+	public Card(CardFace face, CardSuit suit)	//Constructor
 	{
-		this.suit = suit;
 		this.face = face;
+		this.suit = suit;
 	}
 
-	public void getCard(){	//make this a string statement?
-		System.out.println(face.toString() + " of " + suit.toString());
-
-	}
-
-	public int getSuitRank(){	//Returns the rank of the suit
-		return suit.getRank();
+	public String getCard(){	//make this a string statement?
+		String card = face.toString() + " of " + suit.toString();
+		return card;
+		//System.out.println(face.toString() + " of " + suit.toString());
 	}
 
 	public int getFaceVal(){	//Returns the value of the card
 		return face.getVal();
+	}
+
+	public int getSuitRank(){	//Returns the rank of the suit
+		return suit.getRank();
 	}
 }

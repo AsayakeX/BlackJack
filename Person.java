@@ -2,9 +2,10 @@ import java.util.*;
 
 public class Person	//See if we cant get this to be an abstract class
 {
-	private funds;
-	private final initFunds = 500
+	private int funds;
+	private final int initFunds = 500;
 
+//Constructors
 	public Person(){
 		funds = initFunds;
 	}
@@ -13,6 +14,7 @@ public class Person	//See if we cant get this to be an abstract class
 		funds = f;
 	}
 
+//Functions
 	public int getFunds(){
 		return funds;
 	}
@@ -28,5 +30,4 @@ public class Person	//See if we cant get this to be an abstract class
 	public void subFunds(int n){
 		this.funds -= n;
 	}
-	
 }
