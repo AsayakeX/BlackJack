@@ -222,7 +222,7 @@ public class BlackJack
 				System.out.println("Play again? \n(y/n): ");
 				choice = sc.nextLine();
 
-				switch(choic.toLowerCase()){
+				switch(choice.toLowerCase()){
 					case "y":
 						validInput = true;
 						initState();
