@@ -1,18 +1,19 @@
 import java.util.Random;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class BlackJack
 {
-	final int deckSize = 52;
+	//final int deckSize = 52;
 	boolean game = true;
 	
-	ArrayList<Card> cards = new ArrayList<>(deckSize);	//Set of cards
-	int[] deck = new int[deckSize];	//Ints to represent card placement in deck
+	//ArrayList<Card> cards = new ArrayList<>(deckSize);	//Set of cards
+	//int[] deck = new int[deckSize];	//Ints to represent card placement in deck
 
 	ArrayList<Integer> playerHand = new ArrayList<>();
 	ArrayList<Integer> dealerHand = new ArrayList<>();
 
-	int topCard = deckSize;
+	//int topCard = deckSize;
 	int playerVal = 0;
 	int dealerVal = 0;
 	int bet = 0;
@@ -25,58 +26,9 @@ public class BlackJack
 	String choice;
 	
 	//===============================
-	//	Deck Functions 
-	//===============================
-	public void buildCards(){	//Initializes 52 playing cards
-		for(CardSuit suit: CardSuit.values()){
-			for(CardFace face: CardFace.values()){
-				cards.add(new Card(face, suit));
-			}
-		}
-	}
-
-	public void buildDeck(){	//Reference numbers to cards
-		for(int i = 0; i < deckSize; i++){
-			deck[i] = i;
-		}
-	}
-
-	public void buildCD(){	//Calls buildCards and buildDeck
-		buildCards();
-		buildDeck();
-	}
-
-	public void shuffle(){	//test this later
-		for(int i = 0; i < deckSize; i++){
-			int rng = (int)(Math.random()*deckSize);
-			deck[i] += deck[rng];
-			deck[rng] = deck[i]-deck[rng];
-			deck[i] -= deck[rng]
-		}
-	}
-
-	public int deal(int d){	//Returns current top referrence and updates
-		int card = deck[d];
-		d--;
-		return card;
-	}
-
-	//QA functions
-	public void checkCards(){	//QA check cards in deck
-		for(Card card: cards){
-			card.getCard();
-		}
-	}
-
-	public void checkDeck(){	//QA check reference in deck
-		for(int i: deck)
-			System.out.println(Integer.toString(i));
-	}
-	
-	//===============================
 	//	Player Functions 
 	//===============================
-	public void calcHand(ArrayList<Interger> hand, int handVal){
+	public void calcHand(ArrayList<Integer> hand, int handVal){
 		handVal = 0;
 		for(int i: hand){
 			handVal += cards[i].getFaceVal();
@@ -91,7 +43,7 @@ public class BlackJack
 		System.out.println("\nHand Value: " + Integer.toString(handVal));
 	}
 
-	public void calcPrintHand(ArrayList<Interger> hand, int handVal){
+	public void calcPrintHand(ArrayList<Integer> hand, int handVal){
 		calcHand(hand, handVal);
 		printHand(hand, handVal);
 	}
@@ -135,7 +87,7 @@ public class BlackJack
 		playerHand.add(deal(topCard));
 	}
 
-	public void hit(ArrayList<Interger> hand, int handVal, int top, boolean bust){
+	public void hit(ArrayList<Integer> hand, int handVal, int top, boolean bust){
 		hand.add(deal(top));	//card is added
 		calcPrintHand(hand, handVal);
 
