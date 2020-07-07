@@ -4,74 +4,33 @@ import java.util.ArrayList;
 
 public class BlackJack
 {
-	//final int deckSize = 52;
 	boolean game = true;
-	
-	//ArrayList<Card> cards = new ArrayList<>(deckSize);	//Set of cards
-	//int[] deck = new int[deckSize];	//Ints to represent card placement in deck
 
-	ArrayList<Integer> playerHand = new ArrayList<>();
-	ArrayList<Integer> dealerHand = new ArrayList<>();
-
-	//int topCard = deckSize;
-	int playerVal = 0;
-	int dealerVal = 0;
 	int bet = 0;
+	String bust = "n";	//p/d/n
 
-	boolean bustDealer = false;	//check for bust
-	boolean bustPlayer = false;	//check for bust
-	boolean validBet = false;
-	boolean validInput = false;
+	Person player = new Person();
+	Person dealer = new Person();
 
-	String choice;
-	
-	//===============================
-	//	Player Functions 
-	//===============================
-	public void calcHand(ArrayList<Integer> hand, int handVal){
-		handVal = 0;
-		for(int i: hand){
-			handVal += cards[i].getFaceVal();
-		}
-	}
-
-	public void printHand(ArrayList<Integer> hand, int handVal){
-		for(int i: hand){
-			System.out.println(cards[i].getCard());
-		}
-
-		System.out.println("\nHand Value: " + Integer.toString(handVal));
-	}
-
-	public void calcPrintHand(ArrayList<Integer> hand, int handVal){
-		calcHand(hand, handVal);
-		printHand(hand, handVal);
-	}
+	Deck deck = new Deck();
 
 	//===============================
 	//	Game Functions 
 	//===============================
-	public void initState(){
-		playerHand.clear();	//resets the hands
-		dealerHand.clear();
+	public static void reset(){
+		player.clearHand();
+		dealer.clearHand();
 
-		topCard = deckSize;
-		playerVal = 0;
-		dealerVal = 0;
+		deck.shuffle();
 		bet = 0;
-		
-		bustDealer = false;	//check for bust
-		bustPlayer = false;	//check for bust
-		validBet = false;
-		validInput = false;
 	}
 
 	//public void compareHands(Person player, int pHand, int dHand){
-	public void compareHands(Person player){
-		if(playerVal == dealerVal)
+	public static void compareHands(Person p, Person d){
+		if(p.getScore() == d.getScore())
 			return;
 
-		if(playerVal > dealerVal){
+		if(p.getScore() > d.getScore()){
 			player.addFunds(bet);
 		}
 		else{
@@ -79,33 +38,79 @@ public class BlackJack
 		}
 	}
 
-	public void dealPhase(){
-		dealerHand.add(deal(topCard));
-		playerHand.add(deal(topCard));
+	public static void getBet(Scanner sc){
+		boolean valid = false;
+		int temp = 0;
 
-		dealerHand.add(deal(topCard));
-		playerHand.add(deal(topCard));
+		do{
+			System.out.println("Place bet: ");
+			temp = sc.nextInt();
+			if(player.getFunds() >= bet){
+				System.out.println("Bet accepted");
+				bet = temp;
+				valid = true;
+			}
+			else{
+				System.out.println("Not enough funds");
+			}
+		}while(!valid);
 	}
 
-	public void hit(ArrayList<Integer> hand, int handVal, int top, boolean bust){
-		hand.add(deal(top));	//card is added
-		calcPrintHand(hand, handVal);
+	public static void playerPhase(Scanner sc){
+		boolean valid = false;
+		String temp = "";
 
-		if(handVal > 21){
-			bust = true;
-		}
+		do{
+			System.out.println("Hit or Stand?\n(h/s): ");
+			temp = sc.nextLine();
+
+			switch(temp.toLowerCase()){
+				case "h":
+					player.getCard(deck.deal()); //get the card from the player
+					player.tally(deck);	//update score
+					if(player.getScore() > 21){	//check for bust
+						bust = "p";
+						valid = true;	//player phase ends
+					}				
+					break;
+				case "s":
+					valid = true;
+					break;
+				default:
+					System.out.println("Invalid input.");
+			}
+		}while(!valid);
 	}
 
-	public boolean checkBet(Person p, int b){
-		if(p.getFunds() >= b){
-			System.out.println("Bet accepted");
-			bet = b;
-			return true;
+	public static void dealerPhase(){
+		while(dealer.getScore() < 17){	//Continue to get cards until over 17
+			dealer.getCard(deck.deal());	//get card
+			dealer.tally(deck);		//update the score
 		}
-		else{
-			System.out.println("Not enough funds");
-			return false;
-		}
+				
+		if(dealer.getScore() > 21){	//check if bust
+			bust = "d";
+		}			
+	}
+
+	public static void playAgn(Scanner sc){
+		boolean valid = false;
+		String temp = "";
+
+		do{
+			System.out.println("Play again? \n(y/n): ");
+			temp = sc.nextLine();
+
+			if(temp.toLowerCase() == "y" || temp.toLowerCase() == "n"){
+				valid = true;
+				if(temp.toLowerCase() == "n"){
+					game = false;
+				}
+			}
+			else{
+				System.out.println("Invalid input.");
+			}
+		}while(!valid);
 	}
 
 	//===============================
@@ -114,6 +119,38 @@ public class BlackJack
 
 	public static void main(String[] args)
 	{
+		Scanner sc = new Scanner(System.in);
+
+		do{
+			reset();
+			for(int i = 0; i < 0; i++){
+				player.getCard(deck.deal());
+				dealer.getCard(deck.deal());
+			}
+			
+			getBet(sc);		//get valid bet from user
+			playerPhase(sc);	//player hit or stay
+
+			if(bust != "p"){	//if the player didnt bust
+				dealerPhase();	//calculate the dealer
+
+				if(bust != "d"){	//if the dealer didnt bust
+					compareHands(player, dealer);	//calculate the real score
+				}
+				else{
+					player.addFunds(bet);				//dealer busted add to player funds
+				}
+			}
+			else{	//if the player busted
+				player.subFunds(bet);			//deduct from player funds
+			}
+			playAgn();	//ask user if want to play again
+
+		}while(game);
+
+		
+
+		/*
 		Scanner sc = new Scanner(System.in);
 		Person player = new Person();	//Player setup
 
@@ -186,9 +223,11 @@ public class BlackJack
 					default:
 						System.out.println("Invalid input.");
 				}
-			}
+
+
 			while(!validInput);
 		}
 		while(game);
+		*/
 	}
 }

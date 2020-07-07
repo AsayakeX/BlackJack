@@ -36,11 +36,22 @@ public class Deck{
 			deck[rng] = deck[i]-deck[rng];
 			deck[i] -= deck[rng];
 		}
+		top = deckSize;
+	}
+
+	public String printCard(int c){	//testing
+		return cards.get(c).getCard();
+
+	}
+
+	public int getVal(int c){	//test function
+		return cards.get(c).getVal();
+
 	}
 
 	public int deal(){	//Returns current top referrence and updates
-		int topcard = deck[top];
-		topCard--;
+		int topCard = deck[top];
+		top--;
 		return topCard;
 	}
 

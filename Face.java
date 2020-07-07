@@ -6,7 +6,7 @@ public enum Face	//Determines the cards value
 
 	private int val;
 
-	CardFace(int v){	//Constructor
+	Face(int v){	//Constructor
 		val = v;
 	}
 

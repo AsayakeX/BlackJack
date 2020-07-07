@@ -13,11 +13,11 @@ public class Card
 		return card;
 	}
 
-	public int getFaceVal(){	//Returns the value of the card
+	public int getVal(){	//Returns the value of the card
 		return face.getVal();
 	}
 
-	public int getSuitRank(){	//Returns the rank of the suit
+	public int getRank(){	//Returns the rank of the suit
 		return suit.getRank();
 	}
 }
