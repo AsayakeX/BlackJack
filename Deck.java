@@ -1,6 +1,8 @@
+import java.util.ArrayList;
+
 public class Deck{
 	final int deckSize = 52;
-	int top = deckSize;
+	int top = deckSize-1;
 
 	ArrayList<Card> cards;// = new ArrayList<>(deckSize);	//Set of cards
 	int[] deck;// = new int[deckSize];	//Ints to represent card placement in deck
@@ -31,12 +33,13 @@ public class Deck{
 
 	public void shuffle(){	//test this later
 		for(int i = 0; i < deckSize; i++){
-			int rng = (int)(Math.random()*deckSize);
+			//int rng = (int)(Math.random()*deckSize);
+			int rng = (int)(Math.random()*deckSize-1)+0;
 			deck[i] += deck[rng];
 			deck[rng] = deck[i]-deck[rng];
 			deck[i] -= deck[rng];
 		}
-		top = deckSize;
+		top = deckSize-1;
 	}
 
 	public String printCard(int c){	//testing

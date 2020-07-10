@@ -28,8 +28,9 @@ public class Person	//See if we cant get this to be an abstract class
 		score = 0;
 	}
 
-	public void getCard(int c){
+	public void getCard(int c, Deck deck){	//make changes
 		hand.add(c);
+		tally(deck);
 	}
 
 	public int getFunds(){
@@ -37,7 +38,7 @@ public class Person	//See if we cant get this to be an abstract class
 	}
 
 	public String showFunds(){
-		return Integer.toStirng(funds);
+		return Integer.toString(funds);
 	}
 
 	public void addFunds(int n){
@@ -49,6 +50,7 @@ public class Person	//See if we cant get this to be an abstract class
 	}
 
 	public void tally(Deck deck){	//wrong, currently only has references to pos
+		score = 0;	//retally
 		for(int i: hand){
 			score += deck.getVal(i);	//testing
 		}

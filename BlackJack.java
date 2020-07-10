@@ -4,71 +4,87 @@ import java.util.ArrayList;
 
 public class BlackJack
 {
-	boolean game = true;
-
-	int bet = 0;
-	String bust = "n";	//p/d/n
-
-	Person player = new Person();
-	Person dealer = new Person();
-
-	Deck deck = new Deck();
-
 	//===============================
 	//	Game Functions 
 	//===============================
-	public static void reset(){
-		player.clearHand();
-		dealer.clearHand();
-
+	public static void reset(Person p, Person d, Deck deck){
+		p.clearHand();
+		d.clearHand();
 		deck.shuffle();
-		bet = 0;
 	}
 
-	//public void compareHands(Person player, int pHand, int dHand){
-	public static void compareHands(Person p, Person d){
-		if(p.getScore() == d.getScore())
+	public static void showHandD(Person d, Deck deck){
+		System.out.println("\nDealer hand:");
+		d.printHand(deck);
+		System.out.println("\nDealer score:" + d.showScore());
+	}
+
+	public static void showHandP(Person p, Deck deck){
+		System.out.println("\nYour hand:");
+		p.printHand(deck);
+		System.out.println("\nYour score:" + p.showScore());
+	}
+
+	public static void showHands(Person d, Person p, Deck deck){
+		showHandD(d, deck);
+		showHandP(p, deck);
+	}
+
+	public static void compareHands(Person p, Person d, int bet){
+		if(p.getScore() == d.getScore()){
+			System.out.println("\nPush");
 			return;
+		}
 
 		if(p.getScore() > d.getScore()){
-			player.addFunds(bet);
+			System.out.println("\nYou win");
+			p.addFunds(bet);
 		}
 		else{
-			player.subFunds(bet);
+			System.out.println("\nYou lose");
+			p.subFunds(bet);
 		}
 	}
 
-	public static void getBet(Scanner sc){
+	public static int getBet(Scanner sc, Person p){//, int bet){
 		boolean valid = false;
 		int temp = 0;
 
 		do{
-			System.out.println("Place bet: ");
-			temp = sc.nextInt();
-			if(player.getFunds() >= bet){
-				System.out.println("Bet accepted");
-				bet = temp;
-				valid = true;
+			System.out.println("\nAvailable Funds: " + p.showFunds());
+			System.out.print("\nPlace bet: ");
+
+			temp = Integer.parseInt(sc.nextLine());
+			if(temp < 0){
+				System.out.println("\nInvalid Input");
 			}
 			else{
-				System.out.println("Not enough funds");
+				if(p.getFunds() >= temp){
+					System.out.println("\nBet accepted");
+					valid = true;
+				}
+				else{
+					System.out.println("\nNot enough funds");
+				}
 			}
 		}while(!valid);
+		return temp;
 	}
 
-	public static void playerPhase(Scanner sc){
+	public static String playerPhase(Scanner sc, Person d, Person p, Deck deck){
 		boolean valid = false;
 		String temp = "";
+		String bust = "";
 
 		do{
-			System.out.println("Hit or Stand?\n(h/s): ");
+			System.out.print("\nHit or Stand?\n(h/s): ");
 			temp = sc.nextLine();
 
 			switch(temp.toLowerCase()){
 				case "h":
-					player.getCard(deck.deal()); //get the card from the player
-					player.tally(deck);	//update score
-					if(player.getScore() > 21){	//check for bust
+					p.getCard(deck.deal(), deck); //get the card from the player
+					showHands(d, p, deck);	//show hands
+					if(p.getScore() > 21){	//check for bust
 						bust = "p";
 						valid = true;	//player phase ends
 					}				
@@ -77,40 +93,58 @@ public class BlackJack
 					valid = true;
 					break;
 				default:
-					System.out.println("Invalid input.");
+					System.out.println("\nInvalid input.");
 			}
 		}while(!valid);
+		return bust;
 	}
 
-	public static void dealerPhase(){
-		while(dealer.getScore() < 17){	//Continue to get cards until over 17
-			dealer.getCard(deck.deal());	//get card
-			dealer.tally(deck);		//update the score
+	public static String dealerPhase(Person d, Person p, Deck deck){
+		String bust = "";
+
+		while(d.getScore() < 17){	//Continue to get cards until over 17
+			d.getCard(deck.deal(), deck);	//get card
+			showHands(d, p, deck);	//show hands
 		}
 				
-		if(dealer.getScore() > 21){	//check if bust
+		if(d.getScore() > 21){	//check if bust
 			bust = "d";
-		}			
+		}
+
+		return bust;
 	}
 
-	public static void playAgn(Scanner sc){
+	public static Boolean playAgn(Scanner sc, Person p){
 		boolean valid = false;
+		Boolean game = true;
 		String temp = "";
 
-		do{
-			System.out.println("Play again? \n(y/n): ");
-			temp = sc.nextLine();
+		if(p.getFunds() <= 0){
+			System.out.println("\nYou have no funds left!");
+			game = false;
+		}
+		else{
+			do{
+				System.out.print("\nPlay again?\n(y/n): ");
+				temp = sc.nextLine();
 
-			if(temp.toLowerCase() == "y" || temp.toLowerCase() == "n"){
-				valid = true;
-				if(temp.toLowerCase() == "n"){
-					game = false;
+				if(temp.equalsIgnoreCase("y")  || temp.equalsIgnoreCase("n")){
+					valid = true;
+					if(temp.equalsIgnoreCase("y")){
+						System.out.println("\nSetting up next game");
+						game = true;
+					}
+					else{
+						System.out.println("\nExiting game");
+						game = false;
+					}
 				}
-			}
-			else{
-				System.out.println("Invalid input.");
-			}
-		}while(!valid);
+				else{
+					System.out.println("\nInvalid input.");
+				}
+			}while(!valid);
+		}
+		return game;
 	}
 
 	//===============================
@@ -121,113 +155,49 @@ public class BlackJack
 	{
 		Scanner sc = new Scanner(System.in);
 
+		Person player = new Person();
+		Person dealer = new Person();
+		
+		boolean game = true;
+		String bust = "n";	//p/d/n
+		int bet = 0;
+
+		Deck deck = new Deck();
+		
+		deck.buildCD();
+
 		do{
-			reset();
-			for(int i = 0; i < 0; i++){
-				player.getCard(deck.deal());
-				dealer.getCard(deck.deal());
+			reset(player, dealer, deck);
+			bet = getBet(sc, player);		//get valid bet from user
+
+			for(int i = 0; i < 2; i++){		//Pass initial cards
+				player.getCard(deck.deal(), deck);
+				dealer.getCard(deck.deal(), deck);
 			}
+
+			showHands(dealer, player, deck);
 			
-			getBet(sc);		//get valid bet from user
-			playerPhase(sc);	//player hit or stay
+			bust = playerPhase(sc, dealer, player, deck);	//player hit or stay
 
-			if(bust != "p"){	//if the player didnt bust
-				dealerPhase();	//calculate the dealer
+			if(!bust.equalsIgnoreCase("p")){	//if the player didnt bust
+				bust = dealerPhase(dealer, player, deck);	//calculate the dealer
 
-				if(bust != "d"){	//if the dealer didnt bust
-					compareHands(player, dealer);	//calculate the real score
+				if(!bust.equalsIgnoreCase("d")){	//if the dealer didnt bust
+					compareHands(player, dealer, bet);	//calculate the real score
 				}
 				else{
+					System.out.println("\nYou win");
 					player.addFunds(bet);				//dealer busted add to player funds
 				}
 			}
 			else{	//if the player busted
+				System.out.println("\nYou lose");
 				player.subFunds(bet);			//deduct from player funds
 			}
-			playAgn();	//ask user if want to play again
+			game = playAgn(sc, player);	//ask user if want to play again
 
 		}while(game);
 
 		
-
-		/*
-		Scanner sc = new Scanner(System.in);
-		Person player = new Person();	//Player setup
-
-		buildCD();	//Deck setup
-
-		do{		//Game Setup
-			do{		//Bet phase
-				System.out.println("Place bet: ");
-				bet = sc.nextInt();
-				validBet = checkBet(player, bet);
-			}
-			while(!validBet);
-
-			shuffle();
-			dealPhase(); //deal initial cards
-			calcPrintHand(playerHand, playerVal);
-			calcPrintHand(dealerHand, dealerVal);
-			
-			//player phase
-			do{
-				System.out.println("Hit or Stand?\n(h/s): ");
-				choice = sc.nextLine();
-
-				switch(choice.toLowerCase()){
-					case "h":
-						hit(playerHand, playerVal, topCard, bustPlayer);	//player get card
-						if(bustPlayer)	//if the player busts
-							validInput = true;	//player phase ends
-						break;
-					case "s":
-						validInput = true;
-						break;
-					default:
-						System.out.println("Invalid input.");
-				}
-			}
-			while(!validInput);
-
-			if(bustPlayer){//player loses so go to next game
-				player.subFunds(bet);	
-			}
-			else{	//Dealer Phase: when player did not bust
-				while(dealerVal < 17){	// this works because dealer bust when over 17 anyway
-					hit(dealerHand, dealerVal, topCard, bustDealer);	//dealer get card
-				}
-				
-				if(bustDealer){
-					player.addFunds(bet);	//player wins so go to next game
-				}
-				else{	//Reveal Phase
-					compareHands(player);	//deals with win/lose/draw
-				}				
-			}
-
-			validInput = false;	//check for a valid input from user
-
-			do{
-				System.out.println("Play again? \n(y/n): ");
-				choice = sc.nextLine();
-
-				switch(choice.toLowerCase()){
-					case "y":
-						validInput = true;
-						initState();
-						break;
-					case "n":
-						validInput = true;	//
-						game = false;	//flag to exit game
-						break;
-					default:
-						System.out.println("Invalid input.");
-				}
-
-
-			while(!validInput);
-		}
-		while(game);
-		*/
 	}
 }
